@@ -1,0 +1,245 @@
+services:
+  mysqldb:
+    image: mysql:9
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: clinica_db
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "3310:3306"
+    networks:
+      - red-clinica
+    volumes:
+      - mysqldb:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+      interval: 30s
+    restart: always
+  mysql-backup:
+    image: mysql:9
+    depends_on:
+      - mysqldb
+    volumes:
+      - ./backups:/backups
+    command: |
+      sh -c "
+      while true; do
+        mysqldump -h mysql-db -u root -p123456 clinica_db > /backups/backup_$(date +%Y%m%d_%H%M%S).sql
+        sleep 86400
+      done"
+
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    image: eureka-server:latest
+    ports:
+      - "8761:8761"
+    networks:
+      - red-clinica
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - mysqldb
+    restart: always
+  config-server:
+    build:
+      context: ./config-server
+      dockerfile: Dockerfile
+    image: config-server:latest
+    ports:
+      - "8888:8888"
+    networks:
+      - red-clinica
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - eureka-server
+    restart: always
+  api-gateway-service:
+    build:
+      context: ./api-gateway-service
+      dockerfile: Dockerfile   
+    image: api-gateway-service:latest
+    ports:
+      - "8014:8014"                   
+    networks:
+      - red-clinica                   
+    environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - config-server
+    restart: always
+  pacientes-service:
+    build:
+      context: ./pacientes-service
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    networks:
+      - red-clinica
+    environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - config-server
+    restart: always
+  empleados-service:
+    build:
+      context: ./empleados-service
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8084"
+    networks:
+      - red-clinica
+    environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - config-server
+    restart: always
+  
+  cita-service:
+    build:
+      context: ./cita-service
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    networks:
+      - red-clinica
+    environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - config-server
+    restart: always
+  franquicia-service:
+    build:
+      context: ./franquicia-service
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    networks:
+      - red-clinica
+    environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - config-server
+    restart: always
+
+  historialclinica-service:
+    build:
+      context: ./historialclinica-service
+      dockerfile: Dockerfile
+    ports:
+      - "8086:8086"
+    networks:
+      - red-clinica
+    environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - config-server
+    restart: always
+
+  informe-service:
+    build:
+      context: ./informe-service
+      dockerfile: Dockerfile
+    ports:
+      - "8085:8085"
+    networks:
+      - red-clinica
+    environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - config-server
+    restart: always
+  pagos-service:
+    build:
+      context: ./pagos-service
+      dockerfile: Dockerfile
+    ports:
+      - "8087:8087"
+    networks:
+      - red-clinica
+    environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - config-server
+    restart: always
+
+  notificaciones-service:
+    build:
+      context: ./notificaciones-service
+      dockerfile: Dockerfile
+    ports:
+      - "8088:8088"
+    networks:
+      - red-clinica
+    environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - config-server
+    restart: always
+  redis:
+    image: redis:6  
+    ports:
+      - "6379:6379"
+    networks:
+      - red-clinica
+    restart: always
+
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - red-clinica
+    environment:
+      - ZIPKIN_HTTP_PORT=9411
+    restart: always
+
+  prometheus:
+    image: prom/prometheus:v2.29.1
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - red-clinica
+    restart: always
+
+  grafana:
+    image: grafana/grafana:8.2.3
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+    ports:
+      - "3000:3000"
+    networks:
+      - red-clinica
+    depends_on:
+      - prometheus
+    restart: always
+networks:
+  red-clinica:
+    driver: bridge
+
+volumes:
+  mysqldb:

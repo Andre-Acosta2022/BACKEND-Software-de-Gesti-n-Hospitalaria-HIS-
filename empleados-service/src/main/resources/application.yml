@@ -1,0 +1,14 @@
+spring:
+  config:
+    import: "configserver:http://config-server:8888"
+  application:
+    name: personal-service
+server:
+  port: 8084
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true

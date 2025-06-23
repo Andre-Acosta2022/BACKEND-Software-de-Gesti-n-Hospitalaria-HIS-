@@ -81,6 +81,7 @@
 		<module>HistorialClinica-service</module>
 		<module>Informe-service</module>
 		<module>Pagos-Service</module>
+		<module>Notificaciones-Service</module>
 
     </modules>
 	<build>

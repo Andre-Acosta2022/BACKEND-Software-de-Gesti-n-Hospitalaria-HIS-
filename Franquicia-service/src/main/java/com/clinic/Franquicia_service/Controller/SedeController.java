@@ -15,38 +15,27 @@ import java.util.Optional;
 public class SedeController {
     private final SedeService sedeService;
 
+
     @GetMapping
     public ResponseEntity<List<Sede>> getAllSedes() {
-        return ResponseEntity.ok(sedeService.findAllSedes());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Sede> getSedeById(@PathVariable Long id) {
-        Optional<Sede> sede = sedeService.findSedeById(id);
-        return sede.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return ResponseEntity.ok(sedeService.findAllSedes()); // Solo obtiene las sedes de la única clínica
     }
 
     @PostMapping
     public ResponseEntity<Sede> createSede(@RequestBody Sede sede) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(sedeService.saveSede(sede));
+        Sede savedSede = sedeService.saveSede(sede); // Asocia la sede a la clínica única
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedSede);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Sede> updateSede(@PathVariable Long id, @RequestBody Sede sede) {
         sede.setId(id);
-        return ResponseEntity.ok(sedeService.saveSede(sede));
+        return ResponseEntity.ok(sedeService.saveSede(sede)); // Actualiza la sede
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSede(@PathVariable Long id) {
-        sedeService.deleteSede(id);
+        sedeService.deleteSede(id); // Elimina la sede
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/activas")
-    public ResponseEntity<List<Sede>> getSedesActivas() {
-        return ResponseEntity.ok(sedeService.findActiveSedes());
     }
 }

@@ -12,3 +12,36 @@ eureka:
       defaultZone: http://eureka-server:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: notificacion-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: '*'
+    listener:
+      ack-mode: manual
+
+    mail:
+      host: ${MAIL_HOST:smtp.mailtrap.io}
+      port: ${MAIL_PORT:2525}
+      username: ${MAIL_USER:tu_usuario}
+      password: ${MAIL_PASS:tu_contraseña}
+      properties:
+        mail.smtp.auth: true
+        mail.smtp.starttls.enable: true
+      from: notificaciones@clinica.com
+
+    thymeleaf:
+      prefix: classpath:/templates/
+      suffix: .html
+      mode: HTML
+      cache: false
+
+app:
+  topics:
+    citas: citas-topic
+    pagos: pagos-topic
+    urgencias: urgencias-topic

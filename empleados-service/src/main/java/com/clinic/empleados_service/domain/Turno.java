@@ -1,5 +1,6 @@
 package com.clinic.empleados_service.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,5 +34,6 @@ public class Turno {
     private EstadoTurno estado;
 
     @OneToMany(mappedBy = "turno", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Doctor> doctores;
 }

@@ -1,5 +1,7 @@
 package com.clinic.empleados_service.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,8 +31,10 @@ public class Doctor {
 
     @ManyToOne
     @JoinColumn(name = "id_turno", nullable = false)
+    @JsonBackReference
     private Turno turno;
 
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference  // Se serializa la relación
     private List<Disponibilidad> disponibilidades;
 }

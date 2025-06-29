@@ -183,21 +183,6 @@ services:
       - config-server
     restart: always
 
-  notificaciones-service:
-    build:
-      context: ./notificaciones-service
-      dockerfile: Dockerfile
-    ports:
-      - "8088:8088"
-    networks:
-      - red-clinica
-    environment:
-      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-    depends_on:
-      - eureka-server
-      - config-server
-    restart: always
   redis:
     image: redis:6  
     ports:

@@ -10,6 +10,7 @@
     <artifactId>Notificaciones-Service</artifactId>
     <name>Notificaciones-Service</name>
     <description>Notificaciones-Service</description>
+
     <url/>
     <licenses>
         <license/>
@@ -23,6 +24,7 @@
         <tag/>
         <url/>
     </scm>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

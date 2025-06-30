@@ -1,6 +1,5 @@
 package com.clinic.Pagos_Service.client;
 
-import com.clinic.Pagos_Service.DTO.CitaDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

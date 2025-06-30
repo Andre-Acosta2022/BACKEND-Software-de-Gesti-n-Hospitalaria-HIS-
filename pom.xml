@@ -80,6 +80,7 @@
 		<module>Franquicia-service</module>
 		<module>HistorialClinica-service</module>
 		<module>Informe-service</module>
+		<module>Notificaciones-service</module>
 		<module>Pagos-Service</module>
 
     </modules>

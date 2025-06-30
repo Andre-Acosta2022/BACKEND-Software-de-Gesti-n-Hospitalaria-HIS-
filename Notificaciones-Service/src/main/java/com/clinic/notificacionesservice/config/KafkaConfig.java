@@ -1,6 +1,6 @@
 package com.clinic.notificacionesservice.config;
 
-import com.clinic.notificacionesservice.DTO.CitaEvent;
+import com.clinic.notificacionesservice.domain.DTO.NotificationEventDto;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,19 +15,19 @@ import java.util.Map;
 public class KafkaConfig {
 
     @Bean
-    public ConsumerFactory<String, CitaEvent> citaEventConsumerFactory() {
+    public ConsumerFactory<String, NotificationEventDto> citaEventConsumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
         return new DefaultKafkaConsumerFactory<>(
                 props,
                 new StringDeserializer(),
-                new JsonDeserializer<>(CitaEvent.class)
+                new JsonDeserializer<>(NotificationEventDto.class)
         );
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, CitaEvent> citaEventListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, CitaEvent> factory =
+    public ConcurrentKafkaListenerContainerFactory<String, NotificationEventDto> citaEventListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, NotificationEventDto> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(citaEventConsumerFactory());
         return factory;

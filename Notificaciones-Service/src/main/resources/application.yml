@@ -5,7 +5,29 @@ spring:
     import: "configserver:http://config-server:8888"
   application:
     name: notificaciones-service
-
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notification-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.value.default.type: com.clinic.notificacionesservice.domain.DTO.NotificationEventDto
+    listener:
+      missing-topics-fatal: false
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: andre.acosta.2024.official@gmail.com   # Reemplaza con tu correo real
+    password: dlxewmuiswymcnay      # La contraseña generada, sin espacios
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 eureka:
   client:
     service-url:

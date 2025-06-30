@@ -54,8 +54,6 @@ public class UsuarioController {
                 .map(existente -> {
                     existente.setAvatar(datosActualizados.getAvatar());
                     existente.setPersona(datosActualizados.getPersona());
-                    existente.setDirecciones(datosActualizados.getDirecciones());
-                    existente.setTarjetas(datosActualizados.getTarjetas());
                     Usuario actualizado = usuarioService.update(existente);
                     return new ResponseEntity<>(actualizado, HttpStatus.OK);
                 })

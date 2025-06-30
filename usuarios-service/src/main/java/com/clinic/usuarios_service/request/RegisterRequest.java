@@ -1,10 +1,11 @@
 package com.clinic.usuarios_service.request;
 
+import com.clinic.usuarios_service.entities.Persona;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pe.upeu.edu.user.entities.Persona;
+
 
 @AllArgsConstructor
 @NoArgsConstructor

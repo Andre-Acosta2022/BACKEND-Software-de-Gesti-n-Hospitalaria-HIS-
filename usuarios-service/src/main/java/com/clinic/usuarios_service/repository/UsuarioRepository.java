@@ -1,4 +1,4 @@
-package pe.upeu.edu.user.repository;
+package com.clinic.usuarios_service.repository;
 
 import feign.Param;
 import org.springframework.data.jpa.repository.JpaRepository;

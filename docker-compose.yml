@@ -220,7 +220,10 @@ services:
       - config-server
     restart: always
 
+<<<<<<< HEAD
   
+=======
+>>>>>>> c7d2ff806efe9e22c6d353b1082d0e69e9118cec
   redis:
     image: redis:6  
     ports:

@@ -29,7 +29,18 @@ services:
         mysqldump -h mysql-db -u root -p123456 clinica_db > /backups/backup_$(date +%Y%m%d_%H%M%S).sql
         sleep 86400
       done"
-
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2.5
+    command: start --import-realm
+    ports:
+      - "8080:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    volumes:
+      - ./keycloak-export:/opt/keycloak/data/import
+    networks:
+      - red-clinica
   eureka-server:
     build:
       context: ./eureka-server
@@ -58,6 +69,24 @@ services:
     depends_on:
       - eureka-server
     restart: always
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile   
+    image: auth-service:latest
+    ports:
+      - "8014:8014"                   
+    networks:
+      - red-clinica                   
+    environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - eureka-server
+      - config-server
+      - redis
+    restart: always
   api-gateway-service:
     build:
       context: ./api-gateway-service
@@ -73,11 +102,13 @@ services:
     depends_on:
       - eureka-server
       - config-server
+      - redis
     restart: always
   pacientes-service:
     build:
       context: ./pacientes-service
       dockerfile: Dockerfile
+    image: pacientes-service:latest
     ports:
       - "8083:8083"
     networks:
@@ -93,6 +124,7 @@ services:
     build:
       context: ./empleados-service
       dockerfile: Dockerfile
+    image: empleados-service:latest
     ports:
       - "8084:8084"
     networks:
@@ -109,6 +141,7 @@ services:
     build:
       context: ./cita-service
       dockerfile: Dockerfile
+    image: cita-service:latest
     ports:
       - "8082:8082"
     networks:
@@ -124,6 +157,7 @@ services:
     build:
       context: ./franquicia-service
       dockerfile: Dockerfile
+    image: franquicia-service:latest
     ports:
       - "8081:8081"
     networks:
@@ -140,6 +174,7 @@ services:
     build:
       context: ./historialclinica-service
       dockerfile: Dockerfile
+    image: historialclinica-service:latest
     ports:
       - "8086:8086"
     networks:
@@ -156,6 +191,7 @@ services:
     build:
       context: ./informe-service
       dockerfile: Dockerfile
+    image: informe-service:latest
     ports:
       - "8085:8085"
     networks:
@@ -171,6 +207,7 @@ services:
     build:
       context: ./pagos-service
       dockerfile: Dockerfile
+    image: pagos-service:latest
     ports:
       - "8087:8087"
     networks:
@@ -183,21 +220,7 @@ services:
       - config-server
     restart: always
 
-  notificaciones-service:
-    build:
-      context: ./notificaciones-service
-      dockerfile: Dockerfile
-    ports:
-      - "8088:8088"
-    networks:
-      - red-clinica
-    environment:
-      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-    depends_on:
-      - eureka-server
-      - config-server
-    restart: always
+  
   redis:
     image: redis:6  
     ports:

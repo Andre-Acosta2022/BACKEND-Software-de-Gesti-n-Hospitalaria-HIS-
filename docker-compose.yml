@@ -104,6 +104,23 @@ services:
       - config-server
       - redis
     restart: always
+  
+  usuarios-service:
+    build:
+      context: ./usuarios-service
+      dockerfile: Dockerfile
+    image: usuarios-service:latest
+    ports:
+      - "8015:8015"
+    networks:
+      - red-clinica
+    environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - config-server
+    restart: always
   pacientes-service:
     build:
       context: ./pacientes-service
@@ -220,10 +237,7 @@ services:
       - config-server
     restart: always
 
-<<<<<<< HEAD
-  
-=======
->>>>>>> c7d2ff806efe9e22c6d353b1082d0e69e9118cec
+
   redis:
     image: redis:6  
     ports:

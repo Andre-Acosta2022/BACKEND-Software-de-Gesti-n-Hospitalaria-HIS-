@@ -7,9 +7,7 @@
         <artifactId>clinica-microservicios</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-	<groupId>com.clinic</groupId>
 	<artifactId>auth-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>auth-service</name>
 	<description>Autenticacion con keycloak</description>
 	<url/>
